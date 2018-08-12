@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Document</title>
+  <style>
+    body {
+      background-color: #ddd;
+    }
+
+    #myCanvas {
+      margin: 10px;
+      padding: 10px;
+      background: #fff;
+      /* 默认情况下背景色与父元素背景色一致，这里改为不透明色 */
+      border: 1px solid #03A9F4;
+
+      /* 不指定宽度和高度默认是300*150像素 通常直接在canvas上指定width和height,不需要带px */
+      /* 下面两行写法，可能会产生意外之外的后果，不建议 */
+      width: 600px;
+      height: 300px;
+      /* canvas元素实际上右两套尺寸。一个是元素本身的大小，还有一个是元素绘图表面(drawing surface)的大小 */
+      /* 直接设置width和height，实际上是同时修改了该元素的本身和元素绘图表面的大小 */
+      /* css修改width和height，实际上只会改变元素本身的大小，而不会影响绘图表面，绘图表面的大小依旧是默认的300*150像素 */
+      /* 当canvas元素的大小不符合其绘图表面的大小，浏览器就会对绘图表面就行缩放，使其符合元素大小。通常宽度大于300像素的，内容就会被放大 */
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="myCanvas" width="600" height="300">
+    您的浏览器不支持 HTML5 canvas 标签。
+  </canvas>
+
+  <script>
+    let canvas = document.getElementById("myCanvas"); // 获取canvas的引用
+    var context = canvas.getContext("2d"); // 获取绘图环境变量
+    // canvas 一共有两个属性(width,height) 三个方法(getContext,toDataURL(type,quality),toBlob(callback,type,args...))
+    // getContext() 返回与该canvas相关的绘图环境对象
+    // toDataURL(type,quality) 返回一个数据地址(data URL)，你可以用在img的src属性上。type为image/png(默认),image/jpeg,quality为0-1.0之间的double值，表示图像显示质量。
+    // toBlob(callback,type,args...) 创建一个用于表示该canvas元素的图像文件的blob。第一个参数为回调函数。第二个为图像类型。第三个图像质量
+
+    // 设置环境对象的font,fillStyle,strokeStyle
+    context.font = '38pt Arial';
+    context.fillStyle = "#FF0000";
+    context.strokeStyle = 'blue';
+
+    // fillText()使用fillStyle来填充文本中的字符,后两个参数指横、纵坐标
+    context.fillText('Hello Canvas', canvas.width / 2 - 150, canvas.height / 2 + 15);
+    // strokeText()使用strokeStyle来填充文本中的轮廓线
+    context.strokeText('Hello Canvas', canvas.width / 2 - 150, canvas.height / 2 + 15);
+  </script>
+</body>
+
+</html>
