@@ -1,42 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
-  <title>Document</title>
+  <title>canvas模板</title>
   <style>
-    body {
-      background-color: #ddd;
-    }
+    #canvas {
 
-    #myCanvas {
-      margin: 10px;
-      padding: 10px;
-      background: #fff;
-      /* 默认情况下背景色与父元素背景色一致，这里改为不透明色 */
-      border: 1px solid #03A9F4;
-
-      /* 不指定宽度和高度默认是300*150像素 通常直接在canvas上指定width和height,不需要带px */
-      /* 下面两行写法，可能会产生意外之外的后果，不建议 */
-      width: 600px;
-      height: 300px;
-      /* canvas元素实际上右两套尺寸。一个是元素本身的大小，还有一个是元素绘图表面(drawing surface)的大小 */
-      /* 直接设置width和height，实际上是同时修改了该元素的本身和元素绘图表面的大小 */
-      /* css修改width和height，实际上只会改变元素本身的大小，而不会影响绘图表面，绘图表面的大小依旧是默认的300*150像素 */
-      /* 当canvas元素的大小不符合其绘图表面的大小，浏览器就会对绘图表面就行缩放，使其符合元素大小。通常宽度大于300像素的，内容就会被放大 */
     }
   </style>
 </head>
-
 <body>
-  <canvas id="myCanvas" width="600" height="300">
-    您的浏览器不支持 HTML5 canvas 标签。
-  </canvas>
-
+  <canvas id="canvas"  width="600"  height="600">Canvas  not supported</canvas>
   <script>
-    let canvas = document.getElementById("myCanvas"); 
-    var context = canvas.getContext("2d"); 
+    let canvas = document.getElementById('canvas'),
+    context = canvas.getContext('2d'),
+    FONT_HEIGHT = 15,
+    MARGIN = 35,
+    HAND_TRUNCATION = canvas.width/25,
+    HOUR_HAND_TRUNCATION = canvas.width/10,
+    NUMBERAL_SPACING = 20,
+    RADIUS = canvas.width/2 - MARGIN,
+    HAND_RADIUS = RADIUS + NUMBERAL_SPACING;
+
+    // 绘制钟面的圆形
+    function  drawCircle() {
+      context.beginPath(); // 定义路径
+      context.arc(canvas.width/2, canvas.height/2, RADIUS,0, Math.PI*2,true);  // 创建圆形路径
+      context.stroke();  // 使定义的路径变得可见
+    }
+
+    // 绘制 钟面周围的数字
+    function drawNumerals() {
+      let numerals = [1,2,3,4,5,6,7,8,9,10,11,12],angle = 0, numeralWidth = 0;
+      numerals.forEach(function(numeral){
+        angle = Math.PI/6 * (numeral-3);
+        numeralWidth =  context.measureText(numeral).width;
+        context.fillText(numeral, canvas.width/2+Math.cos(angle)*(HAND_RADIUS) - numeralWidth/2, canvas.height/2 + Math.sin(angle)*(HAND_RADIUS) + FONT_HEIGHT/3);
+      });
+    }
+
+
+    // 绘制 圆心
+    function drawCenter() {
+      context.beginPath();
+      context.arc(canvas.width/2, canvas.height/2, 5, 0, Math.PI*2, true);
+      context.fill();
+    }
+
+    // 绘制指针
+    function drawHand(loc, isHour) {
+      let  angle = (Math.PI*2) * (loc/60) -Math.PI/2, handRadius = isHour ? RADIUS - HAND_TRUNCATION - HOUR_HAND_TRUNCATION : RADIUS - HAND_TRUNCATION;
+
+      context.moveTo(canvas.width/2, canvas.height/2);
+      context.lineTo(canvas.width/2 + Math.cos(angle)*handRadius, canvas.height/2 + Math.sin(angle)*handRadius);
+      context.stroke();
+    }
+
+    function drawHands() {
+      let date = new Date, hour = date.getHours();
+      hour =hour >  12 ?hour -12 : hour;
+
+      drawHand(hour*5 + (date.getMinutes()/60)*5,true,0.5);
+      drawHand(date.getMinutes(), false, 0.5);
+      drawHand(date.getSeconds(), false, 0.2);
+    }
+
+    function drawClock() {
+      context.clearRect(0,0,canvas.width,canvas.height);
+
+      drawCircle();
+      drawCenter();
+      drawHands();
+      drawNumerals();
+    }
+
+    context.font = FONT_HEIGHT + 'px  Arial';
+    loop = setInterval(drawClock,1000);
+    
+
   </script>
 </body>
-
 </html>
